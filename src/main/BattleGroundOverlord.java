@@ -217,6 +217,17 @@ public class BattleGroundOverlord {
 					
 					a.setMoveSelected(true);
 					
+				} else if(a.getCurrentMove().equals("RANDOMDIR")) {
+					Random rand = new Random();
+					
+					int roll = rand.nextInt(99) + 1;
+					
+					if(roll <= 50 && roll >= 1)
+						a.setCurrentTurn("LEFT");
+					if(roll > 50 && roll <= 100)
+						a.setCurrentTurn("RIGHT");
+
+					a.setMoveSelected(true);
 				} else {
 					a.setMoveSelected(true);
 				}
@@ -251,7 +262,7 @@ public class BattleGroundOverlord {
 					case NORTH : {
 						if(y - 1 >= 0) {						
 							if(grid.get(y - 1).get(x).getAgent() != null
-						//	&& !(grid.get(y - 1).get(x).getAgent().getFacing() == Direction.SOUTH)		
+							&& !(grid.get(y - 1).get(x).getAgent().getFacing() == Direction.SOUTH)		
 							&& !(grid.get(y - 1).get(x).getAgent().getName().equals(a.getName()))) {						
 								
 								a.setHost(grid.get(y - 1).get(x).getAgent());								
@@ -262,7 +273,7 @@ public class BattleGroundOverlord {
 					case EAST  : { 
 						if(x + 1 < s.gridWidth) {				
 							if(grid.get(y).get(x + 1).getAgent() != null
-						//	&& !(grid.get(y).get(x + 1).getAgent().getFacing() == Direction.WEST)
+							&& !(grid.get(y).get(x + 1).getAgent().getFacing() == Direction.WEST)
 							&& !grid.get(y).get(x + 1).getAgent().getName().equals(a.getName())) {
 
 								a.setHost(grid.get(y).get(x + 1).getAgent());	
@@ -273,7 +284,7 @@ public class BattleGroundOverlord {
 					case SOUTH : {
 						if(y + 1 < s.gridHeight) {				
 							if(grid.get(y + 1).get(x).getAgent() != null
-						//	&& !(grid.get(y + 1).get(x).getAgent().getFacing() == Direction.NORTH)	
+							&& !(grid.get(y + 1).get(x).getAgent().getFacing() == Direction.NORTH)	
 							&& !grid.get(y + 1).get(x).getAgent().getName().equals(a.getName())) {
 
 								a.setHost(grid.get(y + 1).get(x).getAgent());	
@@ -284,7 +295,7 @@ public class BattleGroundOverlord {
 					case WEST  : { 
 						if(x - 1 >= 0) {				
 							if(grid.get(y).get(x - 1).getAgent() != null
-						//	&& !(grid.get(y).get(x - 1).getAgent().getFacing() == Direction.EAST)	
+							&& !(grid.get(y).get(x - 1).getAgent().getFacing() == Direction.EAST)	
 							&& !grid.get(y).get(x - 1).getAgent().getName().equals(a.getName())) {								
 
 								a.setHost(grid.get(y).get(x - 1).getAgent());	
