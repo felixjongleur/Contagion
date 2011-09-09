@@ -65,7 +65,7 @@ public class Agent {
 			
 			if(token.equals("#NAME")) {
 				this.name = tk.nextToken();
-			} else if(token.equals("#IMAGEFILENAME")) {
+			} else if(token.equals("#IMAGE_FILE_NAME")) {
 				this.imageName = tk.nextToken();
 			} else if(token.equals("#INSTRUCTIONS")) {
 				while(tk.hasMoreTokens()) {
@@ -110,7 +110,8 @@ public class Agent {
 	}
 	
 	private void infectHost() {
-		System.out.println(name + " : INFECTS : " + host.getName());
+		if(BattleGround.debug)
+			System.out.println(name + " : INFECTS : " + host.getName());
 		host.setName(getName());
 		host.setMoves(getMoves());
 		host.setImage(getImage());
@@ -119,7 +120,8 @@ public class Agent {
 	}
 	
 	final void turnLeft() {
-		System.out.println(name + " : LEFT");
+		if(BattleGround.debug)
+			System.out.println(name + " : LEFT");
 		switch (facing) {
 			case NORTH : { facing = Direction.WEST; break; }
 			case EAST  : { facing = Direction.NORTH; break; }
@@ -129,7 +131,8 @@ public class Agent {
 	}
 	
 	final void turnRight() {
-		System.out.println(name + " : RIGHT");
+		if(BattleGround.debug)
+			System.out.println(name + " : RIGHT");
 		switch (facing) {
 			case NORTH : { facing = Direction.EAST; break; }
 			case EAST  : { facing = Direction.SOUTH; break; }

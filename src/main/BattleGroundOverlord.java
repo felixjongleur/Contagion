@@ -23,7 +23,7 @@ public class BattleGroundOverlord {
 			}
 		}
 		
-		printMoveMap();
+	//	printMoveMap();
 		
 		this.grid = grid; 
 		this.s = s;
@@ -66,25 +66,31 @@ public class BattleGroundOverlord {
 		System.out.println();
 	}
 	
-	public static void enterAgent(Agent a) {
-		competitors.add(a);
-	}
-	
-	public void assignLocationAndDirectionToAgents() {
+	public void enterAgent() {
+		
+		Agent a = new Agent(StagingArea.getNextFile());		
 		
 		Random rand = new Random();
-		
-		Agent a = competitors.get(competitorsPosition);
 
 		Cell location = null;
 		Direction facing = null;
+		/*
+		if(a.getName().equals("Left")) {
+			location = grid.get(0).get(0);
+			facing = Direction.EAST;
+		}
+		
+		if(a.getName().equals("Right")) {
+			location = grid.get(0).get(grid.size() - 1);
+			facing = Direction.WEST;
+		}*/
 		
 		while(location == null) {
 			int x = rand.nextInt(s.gridWidth);
 			int y = rand.nextInt(s.gridHeight);
 			
-/*			System.out.println("X = " + x);
-			System.out.println("Y = " + y);*/
+		//	System.out.println("X = " + x);
+		//	System.out.println("Y = " + y);
 			
 			if(grid.get(y).get(x).getAgent() == null)				
 				location = grid.get(y).get(x);
@@ -107,9 +113,9 @@ public class BattleGroundOverlord {
 		
 		location.setAgent(a);
 		
-		competitorsPosition++;
+		competitors.add(a);
 		
-		if(competitorsPosition == competitors.size()) {
+		if(competitors.size() == StagingArea.totalMaxNumber) {
 			BattleGround.start = false;
 		}
 	}
@@ -372,7 +378,8 @@ public class BattleGroundOverlord {
 					switch(a.getFacing()) {
 						case NORTH : {
 							if(moveMap[y - 1][x] == 1) {
-								System.out.println(a.getName() + " : FORWARD");
+								if(BattleGround.debug)
+									System.out.println(a.getName() + " : FORWARD");
 								grid.get(y - 1).get(x).setAgent(a);
 								grid.get(y).get(x).setAgent(null);
 								a.setLocation(grid.get(y - 1).get(x));							
@@ -384,7 +391,8 @@ public class BattleGroundOverlord {
 						}
 						case EAST  : { 
 							if(moveMap[y][x + 1] == 1) {
-								System.out.println(a.getName() + " : FORWARD");
+								if(BattleGround.debug)
+									System.out.println(a.getName() + " : FORWARD");
 								grid.get(y).get(x + 1).setAgent(a);
 								grid.get(y).get(x).setAgent(null);
 								a.setLocation(grid.get(y).get(x + 1));							
@@ -396,7 +404,8 @@ public class BattleGroundOverlord {
 						}
 						case SOUTH : {
 							if(moveMap[y + 1][x] == 1) {
-								System.out.println(a.getName() + " : FORWARD");
+								if(BattleGround.debug)
+									System.out.println(a.getName() + " : FORWARD");
 								grid.get(y + 1).get(x).setAgent(a);
 								grid.get(y).get(x).setAgent(null);
 								a.setLocation(grid.get(y + 1).get(x));							
@@ -408,7 +417,8 @@ public class BattleGroundOverlord {
 						}
 						case WEST  : {  
 							if(moveMap[y][x - 1] == 1) {
-								System.out.println(a.getName() + " : FORWARD");
+								if(BattleGround.debug)
+									System.out.println(a.getName() + " : FORWARD");
 								grid.get(y).get(x - 1).setAgent(a);
 								grid.get(y).get(x).setAgent(null);
 								a.setLocation(grid.get(y).get(x - 1));							

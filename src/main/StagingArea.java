@@ -5,7 +5,9 @@ import java.io.File;
 
 public class StagingArea {
 	
-	private static int maxNumber = 50;
+	static int totalMaxNumber;
+	private static int filePos = 0;
+	static File[] listOfFiles;
 	
 	public StagingArea() {
 
@@ -14,20 +16,35 @@ public class StagingArea {
 	public static void createStagingArea() {
 		String path = "createdAgents";
 		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
+		listOfFiles = folder.listFiles();
 
-		System.out.println("    COMPETITORS!!    ");
-		System.out.println("---------------------");
-		for(int i = 0; i < listOfFiles.length; i++) {
-			if(listOfFiles[i].isFile()) {
-				System.out.println(listOfFiles[i].getName());				
+		if(BattleGround.debug) {
+			System.out.println("    COMPETITORS!!    ");
+			System.out.println("---------------------");
+			for(int i = 0; i < listOfFiles.length; i++) {
+				if(listOfFiles[i].isFile()) {
+					System.out.println(listOfFiles[i].getName());				
+				}
 			}
 		}
 		
+		totalMaxNumber = BattleGround.maxNumber * listOfFiles.length;
+		/*
 		for(int number = 0; number < maxNumber; number++) {
 			for(File config : listOfFiles) {
 				BattleGroundOverlord.enterAgent(new Agent(config));
 			}
-		}
+		}*/
+	}
+	
+	public static File getNextFile() {
+		File temp = listOfFiles[filePos];
+		
+		filePos++;
+		
+		if(filePos == listOfFiles.length)
+			filePos = 0;
+		
+		return temp;
 	}
 }
