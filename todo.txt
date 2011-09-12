@@ -1,0 +1,9 @@
+speed (fps)
+scale
+dimensions (width and height)
+number of contagients
+show available files
+	- file selection
+	- select file from harddrive
+		- verify file before making available
+

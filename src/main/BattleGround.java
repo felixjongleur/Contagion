@@ -12,7 +12,7 @@ final public class BattleGround extends PApplet {
 	
 	private static final long serialVersionUID = -734490989373114569L;
 	static boolean start = true;
-	int scale = 10; // must be >=2 to render correctly
+	int scale = 20; // must be >=2 to render correctly
 	int gridWidth = 30; // width in # of cells
 	int gridHeight = 30; // height in # of cells
 	int xSpacing = 10; //size of border around grid in pixels
@@ -28,8 +28,8 @@ final public class BattleGround extends PApplet {
 	Map<String, Triplet> nameToNumberMap = new HashMap<String, Triplet>();
 		
 	public void setup() {
-		size(scale * gridWidth + 175, scale * gridHeight + 50); //set size of the sketch
-		frameRate(fps); //set fps
+		size(scale * gridWidth + 175, scale * gridHeight + 100); //set size of the sketch
+		frameRate(150); //set fps
 		smooth(); //draw with anti-aliasing
 		
 		grid = new ArrayList<ArrayList<Cell>>();
@@ -120,7 +120,7 @@ final public class BattleGround extends PApplet {
 		}
 		
 		if(!start) {
-			frameRate(5);
+			frameRate(150);
 			bgo.getAgentsTurns();
 			bgo.executeAgentsTurns();
 		}
