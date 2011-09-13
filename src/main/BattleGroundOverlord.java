@@ -115,8 +115,8 @@ public class BattleGroundOverlord {
 		
 		competitors.add(a);
 		
-		if(competitors.size() == StagingArea.totalMaxNumber) {
-			BattleGround.start = false;
+		if(competitors.size() == BattleGround.totalMaxNumber) {
+			BattleGround.start = 0;
 		}
 	}
 	

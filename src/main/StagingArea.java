@@ -5,7 +5,6 @@ import java.io.File;
 
 public class StagingArea {
 	
-	static int totalMaxNumber;
 	private static int filePos = 0;
 	static File[] listOfFiles;
 	
@@ -28,7 +27,6 @@ public class StagingArea {
 			}
 		}
 		
-		totalMaxNumber = BattleGround.maxNumber * listOfFiles.length;
 		/*
 		for(int number = 0; number < maxNumber; number++) {
 			for(File config : listOfFiles) {
