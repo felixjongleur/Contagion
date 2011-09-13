@@ -10,9 +10,9 @@ import controlP5.*;
 
 final public class BattleGround extends PApplet {
 	
-	ControlP5 cp5;
-	DropdownList d1;
+	ControlP5 controlP5;
 	Button startButton;
+	
 	
 	private static final long serialVersionUID = -734490989373114569L;
 	static int start = 0;
@@ -26,14 +26,15 @@ final public class BattleGround extends PApplet {
 	int maxNumber = 25;
 	static boolean debug = false;
 
-	static int totalMaxNumber;
+	static int totalMaxNumber = 25;
 	
 	private ArrayList<ArrayList<Cell>> grid; //Matrix of Cells
 	private BattleGroundOverlord bgo;
 
 	Map<String, Triplet> nameToNumberMap = new HashMap<String, Triplet>();
-		
+	
 	public void setup() {
+	  controlP5 = new ControlP5(this);
 		size(scale * gridWidth + 175, scale * gridHeight + 150); //set size of the sketch
 		frameRate(150); //set fps
 		smooth(); //draw with anti-aliasings
@@ -53,7 +54,7 @@ final public class BattleGround extends PApplet {
 
 
 		totalMaxNumber = maxNumber * StagingArea.listOfFiles.length;
-	/*	
+			/*	
 		String loadPath = selectInput();  // Opens file chooser
 		if (loadPath == null) {
 		  // If a file was not selected
@@ -63,20 +64,32 @@ final public class BattleGround extends PApplet {
 		  println(loadPath);
 		}*/
 		
-		cp5 = new ControlP5(this);
-		startButton = cp5.addButton("start",1,10,scale * gridHeight + 34, 80,15);
+		startButton = controlP5.addButton("start",1,10,scale * gridHeight + 34, 80,15);
 		startButton.setColorActive(color(255,128));
-		startButton.setColorBackground(color(60));
-		d1 = cp5.addDropdownList("maxNumber", 100, scale * gridHeight + 50, 120, 100);
-		customize(d1, "Max # of Each - 25","Max # of Each - ", 1, ((gridWidth * gridHeight) / StagingArea.listOfFiles.length));
-	}
+		
 
+		  controlP5.addSlider("Starting # of each",100,200,100,100,200,100,10);
+//		d1 = controlP5.addDropdownList("maxNumber", 100, scale * gridHeight + 50, 120, 100);
+//		customize(d1, "Max # of Each - 25","Max # of Each - ", 1, ((gridWidth * gridHeight) / StagingArea.listOfFiles.length));
+		
+
+		// add horizontal sliders
+	//	Slider s1 = controlP5.addSlider("# of each",1,100,25,100,scale * gridHeight + 34,100,15);
+	//	s1.setSliderMode(Slider.FLEXIBLE);
+	//	controlP5.addSlider("sliderTicks2",0,255,128,200,220,100,10);
+  	//	Slider s2 = (Slider)controlP5.controller("sliderTicks2");
+  	//	s2.setNumberOfTickMarks(7);
+  		// use Slider.FIX or Slider.FLEXIBLE to change the slider handle
+  		// by default it is Slider.FIX
+  	//	s2.setSliderMode(Slider.FLEXIBLE);
+	} 
+/*
 	public void start(int theValue) {
 		println(theValue);
 		start = theValue;
 		startButton.lock();
 		d1.disableCollapse();
-	}
+	}*/
 	
 	public void maxNumber(int theValue) {
 		println(theValue);
@@ -93,7 +106,6 @@ final public class BattleGround extends PApplet {
 		  for(int i=min;i<=max;i++) {
 		    ddl.addItem(text+i,i);
 		  }
-		  ddl.setColorBackground(color(60));
 		  ddl.setColorActive(color(255,128));
 		}
 
@@ -158,6 +170,7 @@ final public class BattleGround extends PApplet {
 			String text = nameNumber.getKey() + " : " + nameNumber.getValue().getA()
 			+ " : " + nameNumber.getValue().getB()
 			+ " : " + nameNumber.getValue().getC();
+			fill(0, 102, 153);
 			text(text, (gridWidth * scale + xSpacing + 15), spacing);
 			spacing+=15;
 		}
@@ -175,19 +188,22 @@ final public class BattleGround extends PApplet {
 		  // therefore you need to check the originator of the Event with
 		  // if (theEvent.isGroup())
 		  // to avoid an error message from controlP5.
-		System.out.println(theEvent);
-System.out.println("HELLO!");
 		  if (theEvent.isGroup()) {
 		    // check if the Event was triggered from a ControlGroup
 		    println(theEvent.group().value()+" from "+theEvent.group());
 		    
-		    if(theEvent.group().name().equals("maxNumber")) {
-		    	maxNumber = (int) theEvent.group().value();
-				totalMaxNumber = maxNumber * StagingArea.listOfFiles.length;
-		    }
+
 		    
 		  } else if(theEvent.isController()) {
 		    println(theEvent.controller().value()+" from "+theEvent.controller());
+		    
+		    if(theEvent.controller().name().equals("Starting # of each")) {
+		    	System.out.println(maxNumber);
+		    	maxNumber = (int) theEvent.controller().value();
+		    	System.out.println(StagingArea.listOfFiles.length);
+				totalMaxNumber = maxNumber * StagingArea.listOfFiles.length;
+		    }
+		    
 		  }
 		}
 }
