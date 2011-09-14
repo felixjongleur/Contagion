@@ -1,27 +1,44 @@
 package main;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import processing.core.PApplet;
-import controlP5.*;
+import controlP5.Button;
+import controlP5.ControlEvent;
+import controlP5.ControlP5;
+import controlP5.ControlWindow;
+import controlP5.DropdownList;
+import controlP5.ListBox;
+import controlP5.Slider;
 
 final public class BattleGround extends PApplet {
 	
 	ControlP5 controlP5;
 	Button startButton;
-	
+	Button resetButton;
+	Slider maxNum;
+	Slider framesPerSecond;
+	Slider renderScale;
+	Slider dimensions;
+		
+	ControlWindow settingsWindow;
+
+	ListBox allFiles;
+	ListBox selectedFiles;
 	
 	private static final long serialVersionUID = -734490989373114569L;
 	static int start = 0;
+	int reset = 0;
 	int scale = 20; // must be >=2 to render correctly
 	int gridWidth = 20; // width in # of cells
 	int gridHeight = 20; // height in # of cells
 	int xSpacing = 10; //size of border around grid in pixels
 	int ySpacing = 10; //size of border around grid in pixels
-	int fps = 1000; //fps to run animation at
+	int fps = 5; //fps to run animation at
 
 	int maxNumber = 25;
 	static boolean debug = false;
@@ -31,13 +48,146 @@ final public class BattleGround extends PApplet {
 	private ArrayList<ArrayList<Cell>> grid; //Matrix of Cells
 	private BattleGroundOverlord bgo;
 
-	Map<String, Triplet> nameToNumberMap = new HashMap<String, Triplet>();
+	Map<String, Triplet> nameToNumberMap;
 	
 	public void setup() {
-	  controlP5 = new ControlP5(this);
-		size(scale * gridWidth + 175, scale * gridHeight + 150); //set size of the sketch
-		frameRate(150); //set fps
+		
+		size(scale * gridWidth + 175, scale * gridHeight + 200); //set size of the sketch
+		
+		frameRate(60); //set fps
 		smooth(); //draw with anti-aliasings
+		
+		nameToNumberMap = new HashMap<String, Triplet>();
+		
+		grid = new ArrayList<ArrayList<Cell>>();
+		
+		for (int y = 0; y < gridHeight; y++) {
+			grid.add(new ArrayList<Cell>());
+			for (int x = 0; x < gridWidth; x++) {
+				grid.get(y).add(new Cell(x, y));
+			}
+		}	
+		
+		bgo = new BattleGroundOverlord(grid, this);	
+
+		StagingArea.createStagingArea();
+
+		totalMaxNumber = maxNumber * StagingArea.listOfFiles.size();
+			/*	
+		String loadPath = selectInput();  // Opens file chooser
+		if (loadPath == null) {
+		  // If a file was not selected
+		  println("No file was selected...");
+		} else {
+		  // If a file was selected, print path to file
+		  println(loadPath);
+		}*/
+
+		controlP5 = new ControlP5(this);
+		
+		if(settingsWindow == null) {
+			settingsWindow = controlP5.addControlWindow("settings", width + 10, 20, 300, 200);
+			settingsWindow.hideCoordinates();
+			settingsWindow.setTitle("Settings");
+		//	settingsWindow.setUndecorated(true);			
+			settingsWindow.papplet().frame.setAlwaysOnTop(true);
+		}		
+		
+		framesPerSecond = controlP5.addSlider("framesPerSecond",1,60,5,10,10,100,15);
+		framesPerSecond.captionLabel().set("Moves per Second");
+		framesPerSecond.setWindow(settingsWindow);
+		
+		maxNum = controlP5.addSlider("maxNumber",1,(gridWidth * gridHeight)/StagingArea.listOfFiles.size(),25,10,30,100,15);
+		maxNum.captionLabel().set("# of each Contagients");
+		maxNum.setWindow(settingsWindow);
+		
+		renderScale = controlP5.addSlider("renderScale",2,((height - 200) / gridHeight),20,10,50,100,15);
+		renderScale.captionLabel().set("Scale of each square (in pixels)");
+		renderScale.setWindow(settingsWindow);
+		
+		dimensions = controlP5.addSlider("dimensions",sqrt(StagingArea.listOfFiles.size() * maxNumber),((height - 200) / scale),20,10,70,100,15);
+		dimensions.captionLabel().set("# of Squares");
+		dimensions.setWindow(settingsWindow);
+
+		startButton = controlP5.addButton("start",1,10,scale * gridHeight + 34, 30,15);
+		startButton.setColorActive(color(255,128));
+		startButton.lock();
+		
+		resetButton = controlP5.addButton("reset",1,50,scale * gridHeight + 34, 30,15);
+		resetButton.setColorActive(color(255,128));
+		
+		allFiles = controlP5.addListBox("AvailableFiles", 10, scale * gridHeight + 75, 120, 120);
+		allFiles.setItemHeight(15);
+		allFiles.setBarHeight(15);
+		allFiles.captionLabel().toUpperCase(true);
+		allFiles.captionLabel().set("Available Files");
+		allFiles.captionLabel().style().marginTop = 3;
+		allFiles.valueLabel().style().marginTop = 3; // the +/- sign
+		
+		for(int i=0;i<StagingArea.listOfFiles.size();i++) {
+			allFiles.addItem(StagingArea.listOfFiles.get(i).getName(),i);
+		}
+		
+		allFiles.setColorBackground(color(255,128));
+		allFiles.setColorActive(color(0,0,255,128));
+		allFiles.close();
+		
+		selectedFiles = controlP5.addListBox("SelectedFiles", 150, scale * gridHeight + 75, 120, 120);
+		selectedFiles.setItemHeight(15);
+		selectedFiles.setBarHeight(15);
+		selectedFiles.captionLabel().toUpperCase(true);
+		selectedFiles.captionLabel().set("Selected Files");
+		selectedFiles.captionLabel().style().marginTop = 3;
+		selectedFiles.valueLabel().style().marginTop = 3; // the +/- sign
+		selectedFiles.setColorBackground(color(255,128));
+		selectedFiles.setColorActive(color(0,0,255,128));
+		selectedFiles.disableCollapse();
+	} 
+	
+	public void start(int theValue) {
+		start = theValue;
+		startButton.lock();
+		allFiles.close();
+		allFiles.disableCollapse();
+		maxNum.lock();
+		renderScale.lock();
+		dimensions.lock();
+		bgo = new BattleGroundOverlord(grid, this);	
+	}
+	
+	public void reset(int theValue) {
+		reset = theValue;
+		start = 0;
+		
+		gridWidth = 20;
+		gridHeight = 20;
+		maxNumber = 25;
+		scale = 20;
+		fps = 5;
+		
+		StagingArea.listOfActiveFiles.clear();
+		StagingArea.listOfFiles.clear();
+		allFiles.remove();
+		selectedFiles.remove();
+		
+		setup();		
+		
+		startButton.lock();
+		maxNum.unlock();
+		renderScale.unlock();
+		dimensions.unlock();
+	}
+	
+	void dimensions(int number) {
+		
+		boolean changeOtherSettings = false;
+		
+		if(number != gridHeight)
+			changeOtherSettings = true;
+		
+		println("a dimensions event. setting gridWidth and gridHeight to "+number);
+		gridWidth = number;
+		gridHeight = number;
 		
 		grid = new ArrayList<ArrayList<Cell>>();
 		
@@ -48,51 +198,44 @@ final public class BattleGround extends PApplet {
 			}
 		}
 		
-		bgo = new BattleGroundOverlord(grid, this);		
-
-		StagingArea.createStagingArea();
-
-
-		totalMaxNumber = maxNumber * StagingArea.listOfFiles.length;
-			/*	
-		String loadPath = selectInput();  // Opens file chooser
-		if (loadPath == null) {
-		  // If a file was not selected
-		  println("No file was selected...");
-		} else {
-		  // If a file was selected, print path to file
-		  println(loadPath);
-		}*/
-		
-		startButton = controlP5.addButton("start",1,10,scale * gridHeight + 34, 80,15);
-		startButton.setColorActive(color(255,128));
-		
-
-		  controlP5.addSlider("Starting # of each",100,200,100,100,200,100,10);
-//		d1 = controlP5.addDropdownList("maxNumber", 100, scale * gridHeight + 50, 120, 100);
-//		customize(d1, "Max # of Each - 25","Max # of Each - ", 1, ((gridWidth * gridHeight) / StagingArea.listOfFiles.length));
-		
-
-		// add horizontal sliders
-	//	Slider s1 = controlP5.addSlider("# of each",1,100,25,100,scale * gridHeight + 34,100,15);
-	//	s1.setSliderMode(Slider.FLEXIBLE);
-	//	controlP5.addSlider("sliderTicks2",0,255,128,200,220,100,10);
-  	//	Slider s2 = (Slider)controlP5.controller("sliderTicks2");
-  	//	s2.setNumberOfTickMarks(7);
-  		// use Slider.FIX or Slider.FLEXIBLE to change the slider handle
-  		// by default it is Slider.FIX
-  	//	s2.setSliderMode(Slider.FLEXIBLE);
-	} 
-/*
-	public void start(int theValue) {
-		println(theValue);
-		start = theValue;
-		startButton.lock();
-		d1.disableCollapse();
-	}*/
+		if(changeOtherSettings) {
+			renderScale.setMax((height - 200) / gridHeight);
+			maxNum.setMax((gridWidth * gridHeight) / StagingArea.listOfFiles.size());
+		}
+	}
 	
-	public void maxNumber(int theValue) {
-		println(theValue);
+	void renderScale(int number) {
+		
+		boolean changeOtherSettings = false;
+		
+		if(number != scale)
+			changeOtherSettings = true;
+		
+		println("a renderScale event. setting scale to "+number);
+  		scale = number;
+  		
+
+		if(changeOtherSettings)
+			dimensions.setMax(((height - 200) / scale));
+  		
+  	//	width = scale * gridWidth;
+  	//	height = scale * gridHeight;
+  		
+	//	size((scale * gridWidth + 175), (scale * gridHeight + 150)); //set size of the sketch
+	}
+	
+	void framesPerSecond(int number) {
+		println("a framesPerSecond event. setting framesPerSecond to "+number);
+  		fps = number;
+		frameRate(fps);
+	}
+	
+	void maxNumber(int number) {
+		println("a maxNumber event. setting maxNumber to "+number);
+		maxNumber = number;
+		
+		dimensions.setMin(sqrt(StagingArea.listOfFiles.size() * maxNumber));
+		totalMaxNumber = maxNumber * StagingArea.listOfFiles.size();
 	}
 	
 	void customize(DropdownList ddl, String defaultText, String text, int min, int max) {
@@ -176,7 +319,6 @@ final public class BattleGround extends PApplet {
 		}
 		
 		if(start == 0) {
-			frameRate(150);
 			bgo.getAgentsTurns();
 			bgo.executeAgentsTurns();
 		}
@@ -192,17 +334,33 @@ final public class BattleGround extends PApplet {
 		    // check if the Event was triggered from a ControlGroup
 		    println(theEvent.group().value()+" from "+theEvent.group());
 		    
-
+		    if(theEvent.group().name().equals("AvailableFiles")) {
+		    	
+		    	File temp = StagingArea.listOfFiles.get((int) theEvent.group().value());
+		    	
+		    	if(!StagingArea.listOfActiveFiles.contains(temp)) {
+		    		StagingArea.listOfActiveFiles.add(temp);
+		    		selectedFiles.addItem(temp.getName(), 1);
+		    	} else {
+		    		StagingArea.listOfActiveFiles.remove(temp);
+		    		selectedFiles.removeItem(temp.getName());
+		    	}
+		    	
+		    	if(StagingArea.listOfActiveFiles.size() >= 2)
+		    		startButton.unlock();
+		    	else
+		    		startButton.lock();
+		    }
 		    
 		  } else if(theEvent.isController()) {
 		    println(theEvent.controller().value()+" from "+theEvent.controller());
-		    
+		/*    
 		    if(theEvent.controller().name().equals("Starting # of each")) {
 		    	System.out.println(maxNumber);
 		    	maxNumber = (int) theEvent.controller().value();
-		    	System.out.println(StagingArea.listOfFiles.length);
-				totalMaxNumber = maxNumber * StagingArea.listOfFiles.length;
-		    }
+		    	System.out.println(StagingArea.listOfFiles.size());
+				totalMaxNumber = maxNumber * StagingArea.listOfFiles.size();
+		    }*/
 		    
 		  }
 		}

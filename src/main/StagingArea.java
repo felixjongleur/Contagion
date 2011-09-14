@@ -1,12 +1,16 @@
 package main;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StagingArea {
 	
 	private static int filePos = 0;
-	static File[] listOfFiles;
+	static List<File> listOfFiles;
+	
+	static List<File> listOfActiveFiles;
 	
 	public StagingArea() {
 
@@ -15,15 +19,16 @@ public class StagingArea {
 	public static void createStagingArea() {
 		String path = "createdAgents";
 		File folder = new File(path);
-		listOfFiles = folder.listFiles();
-
-		if(BattleGround.debug) {
-			System.out.println("    COMPETITORS!!    ");
-			System.out.println("---------------------");
-			for(int i = 0; i < listOfFiles.length; i++) {
-				if(listOfFiles[i].isFile()) {
-					System.out.println(listOfFiles[i].getName());				
-				}
+		File[] temp = folder.listFiles();
+		listOfFiles = new ArrayList<File>();
+		listOfActiveFiles = new ArrayList<File>();
+		
+		System.out.println("    COMPETITORS!!    ");
+		System.out.println("---------------------");
+		for(int i = 0; i < temp.length; i++) {
+			if(temp[i].isFile()) {
+				System.out.println(temp[i].getName());
+				listOfFiles.add(temp[i]);
 			}
 		}
 		
@@ -36,11 +41,11 @@ public class StagingArea {
 	}
 	
 	public static File getNextFile() {
-		File temp = listOfFiles[filePos];
+		File temp = listOfActiveFiles.get(filePos);
 		
 		filePos++;
 		
-		if(filePos == listOfFiles.length)
+		if(filePos == listOfActiveFiles.size())
 			filePos = 0;
 		
 		return temp;
