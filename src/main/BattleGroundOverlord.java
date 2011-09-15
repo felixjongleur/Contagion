@@ -74,23 +74,10 @@ public class BattleGroundOverlord {
 
 		Cell location = null;
 		Direction facing = null;
-		/*
-		if(a.getName().equals("Left")) {
-			location = grid.get(0).get(0);
-			facing = Direction.EAST;
-		}
-		
-		if(a.getName().equals("Right")) {
-			location = grid.get(0).get(grid.size() - 1);
-			facing = Direction.WEST;
-		}*/
 		
 		while(location == null) {
 			int x = rand.nextInt(s.gridWidth);
 			int y = rand.nextInt(s.gridHeight);
-			
-		//	System.out.println("X = " + x);
-		//	System.out.println("Y = " + y);
 			
 			if(grid.get(y).get(x).getAgent() == null)				
 				location = grid.get(y).get(x);

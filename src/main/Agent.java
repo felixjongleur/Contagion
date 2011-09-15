@@ -3,6 +3,8 @@ package main;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -25,6 +27,8 @@ public class Agent {
 	
 	private int step = 0;
 	private ArrayList<String> moves;
+	static Map<String, PImage> images;
+	
 	
 	public static enum Direction {
 		NORTH, EAST, SOUTH, WEST
@@ -41,8 +45,11 @@ public class Agent {
 		this.moves = new ArrayList<String>();
 		this.moveSelected = false;
 		this.host = null;
-		
 		Scanner scanner = null;
+		
+		if(images == null) {
+			images = new HashMap<String, PImage>();
+		}
 		
 		try {
 			scanner = new Scanner(configFile);
@@ -83,7 +90,14 @@ public class Agent {
 		this.location = location;
 		this.facing = facing;
 		this.currentTurn = null;
-		this.image = s.loadImage(imageName);
+		
+		if(!images.containsKey(imageName)) {
+
+			PImage temp = s.loadImage(imageName);
+			images.put(imageName, temp);
+		}
+
+		this.image = images.get(imageName);
 		
 		image.resize(0, s.scale - 1);
 	}
