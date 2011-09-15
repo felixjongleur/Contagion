@@ -59,6 +59,8 @@ final public class BattleGround extends PApplet {
 
 	Map<String, Triplet> nameToNumberMap;
 	
+	PFont font;
+	
 	public void setup() {
 		
 		size(scale * gridWidth + 175, scale * gridHeight + 200); //set size of the sketch
