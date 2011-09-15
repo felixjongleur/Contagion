@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import processing.core.PApplet;
+import processing.core.PFont;
 import controlP5.Button;
 import controlP5.ControlEvent;
 import controlP5.ControlP5;
@@ -50,12 +51,16 @@ final public class BattleGround extends PApplet {
 
 	Map<String, Triplet> nameToNumberMap;
 	
+	PFont font;
+	
 	public void setup() {
 		
 		size(scale * gridWidth + 175, scale * gridHeight + 200); //set size of the sketch
 		
 		frameRate(60); //set fps
 		smooth(); //draw with anti-aliasings
+
+		  font = createFont("Arial Bold",48);
 		
 		nameToNumberMap = new HashMap<String, Triplet>();
 		
@@ -93,7 +98,7 @@ final public class BattleGround extends PApplet {
 			settingsWindow.papplet().frame.setAlwaysOnTop(true);
 		}		
 		
-		framesPerSecond = controlP5.addSlider("framesPerSecond",1,60,5,10,10,100,15);
+		framesPerSecond = controlP5.addSlider("framesPerSecond",1,1000,5,10,10,100,15);
 		framesPerSecond.captionLabel().set("Moves per Second");
 		framesPerSecond.setWindow(settingsWindow);
 		
@@ -108,10 +113,11 @@ final public class BattleGround extends PApplet {
 		dimensions = controlP5.addSlider("dimensions",sqrt(StagingArea.listOfFiles.size() * maxNumber),((height - 200) / scale),20,10,70,100,15);
 		dimensions.captionLabel().set("# of Squares");
 		dimensions.setWindow(settingsWindow);
+		
+		settingsWindow.hide();
 
 		startButton = controlP5.addButton("start",1,10,scale * gridHeight + 34, 30,15);
 		startButton.setColorActive(color(255,128));
-		startButton.lock();
 		
 		resetButton = controlP5.addButton("reset",1,50,scale * gridHeight + 34, 30,15);
 		resetButton.setColorActive(color(255,128));
@@ -142,6 +148,12 @@ final public class BattleGround extends PApplet {
 		selectedFiles.setColorBackground(color(255,128));
 		selectedFiles.setColorActive(color(0,0,255,128));
 		selectedFiles.disableCollapse();
+
+		startButton.lock();
+		maxNum.lock();
+		framesPerSecond.lock();
+		renderScale.lock();
+		dimensions.lock();
 	} 
 	
 	public void start(int theValue) {
@@ -256,6 +268,14 @@ final public class BattleGround extends PApplet {
 	public void draw() { //automatically loops at specified frameRate
 		background(0); //black out background (clearing any drawing)
 		
+		 textFont(font,36);
+		  // white float frameRate
+		  fill(255);
+		  text(frameRate,20,20);
+		  // gray int frameRate display:
+		  fill(200);
+		  text((frameRate),20,60);
+		
 		for (ArrayList<Cell> a : grid) {
 			for (Cell c : a) {
 				c.drawCell(this);
@@ -346,10 +366,26 @@ final public class BattleGround extends PApplet {
 		    		selectedFiles.removeItem(temp.getName());
 		    	}
 		    	
-		    	if(StagingArea.listOfActiveFiles.size() >= 2)
+		    	if(StagingArea.listOfActiveFiles.size() >= 2) {
+		    		
+		    		maxNum.setMax((gridWidth * gridHeight)/StagingArea.listOfActiveFiles.size());
+		    		
+		    		dimensions.setMin(sqrt(StagingArea.listOfActiveFiles.size() * maxNumber));		    		
+		    		
 		    		startButton.unlock();
-		    	else
+		    		maxNum.unlock();
+		    		framesPerSecond.unlock();
+		    		renderScale.unlock();
+		    		dimensions.unlock();
+		    		settingsWindow.show();
+		    	} else {
 		    		startButton.lock();
+		    		maxNum.lock();
+		    		framesPerSecond.lock();
+		    		renderScale.lock();
+		    		dimensions.lock();
+		    		settingsWindow.hide();
+		    	}
 		    }
 		    
 		  } else if(theEvent.isController()) {
