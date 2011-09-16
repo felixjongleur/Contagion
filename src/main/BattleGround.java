@@ -59,7 +59,7 @@ final public class BattleGround extends PApplet {
 
 	Map<String, Triplet> nameToNumberMap;
 	
-	PFont font;
+//	PFont font;
 	
 	public void setup() {
 		
@@ -301,6 +301,7 @@ final public class BattleGround extends PApplet {
 				nameToNumberMap.put(name, new Triplet(1, maxNumber, maxNumber));
 				Slider temp = controlP5.addSlider(name,0,maxNumber * StagingArea.listOfActiveFiles.size(),maxNumber,gridWidth * scale + xSpacing + 15,statsOffset,100,10);
 		//		temp.setCaptionLabel("");
+				temp.setLock(true);
 				contagientStats.put(name, temp);
 				statsOffset += 50;
 			}
